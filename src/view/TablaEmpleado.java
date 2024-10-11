@@ -1,20 +1,16 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 package view;
 
+import DB.ConexionOracle;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.ResultSet;
 
-/**
- *
- * @author Usuario
- */
+
 public class TablaEmpleado extends javax.swing.JFrame {
 
-    /**
-     * Creates new form TablaEmpleado
-     */
     public TablaEmpleado() {
         initComponents();
         this.setLocationRelativeTo(null);
@@ -29,7 +25,7 @@ public class TablaEmpleado extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tablaEmpleado = new javax.swing.JTable();
         listar = new javax.swing.JButton();
         eliminar = new javax.swing.JButton();
         actualizar = new javax.swing.JButton();
@@ -75,33 +71,48 @@ public class TablaEmpleado extends javax.swing.JFrame {
                 .addGap(32, 32, 32))
         );
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tablaEmpleado.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null}
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "ID Empleado", "Nombre", "Apellido", "Correo", "Telefono", "Direccion"
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(tablaEmpleado);
 
         listar.setBackground(new java.awt.Color(51, 0, 0));
         listar.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
         listar.setForeground(new java.awt.Color(255, 255, 255));
         listar.setText("Listar");
+        listar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                listarActionPerformed(evt);
+            }
+        });
 
         eliminar.setBackground(new java.awt.Color(51, 0, 0));
         eliminar.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
         eliminar.setForeground(new java.awt.Color(255, 255, 255));
         eliminar.setText("Eliminar");
+        eliminar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                eliminarActionPerformed(evt);
+            }
+        });
 
         actualizar.setBackground(new java.awt.Color(51, 0, 0));
         actualizar.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
         actualizar.setForeground(new java.awt.Color(255, 255, 255));
         actualizar.setText("Actualizar");
+        actualizar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                actualizarActionPerformed(evt);
+            }
+        });
 
         salir.setBackground(new java.awt.Color(51, 0, 0));
         salir.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
@@ -117,7 +128,7 @@ public class TablaEmpleado extends javax.swing.JFrame {
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+            .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 1018, Short.MAX_VALUE)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane1)
@@ -169,12 +180,96 @@ public class TablaEmpleado extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void salirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_salirActionPerformed
-
         int x = JOptionPane.showConfirmDialog(null, "¿Estas seguro de salir?", "Banco Perú", JOptionPane.YES_NO_OPTION);
         if (x == 0) {
             System.exit(0);
         }
     }//GEN-LAST:event_salirActionPerformed
+
+    private void listarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_listarActionPerformed
+        DefaultTableModel mt = (DefaultTableModel) tablaEmpleado.getModel();
+        mt.setRowCount(0);
+
+        try (Connection conn = ConexionOracle.getConnection()) {
+            // La consulta
+            String sql = "SELECT ID_Empleado, Nombre, Apellido, Telefono, Direccion, Correo FROM EmpleadoE";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+
+            // Llenar la tabla
+            while (rs.next()) {
+                String idEmpleado = rs.getString("ID_Empleado");
+                String nombreEmpleado = rs.getString("Nombre");
+                String apellidoEmpleado = rs.getString("Apellido");
+                String telefonoEmpleado = rs.getString("Telefono");
+                String direccionEmpleado = rs.getString("Direccion");
+                String correoEmpleado = rs.getString("Correo");
+
+                Object[] fila = {idEmpleado, nombreEmpleado, apellidoEmpleado, telefonoEmpleado, direccionEmpleado, correoEmpleado};
+                mt.addRow(fila);
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Error al cargar los datos: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_listarActionPerformed
+
+    private void actualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actualizarActionPerformed
+        int filaSeleccionada = tablaEmpleado.getSelectedRow();
+
+        if (filaSeleccionada >= 0) {
+            // Obtenemos los valores de la fila seleccionada
+            String idEmpleado = tablaEmpleado.getValueAt(filaSeleccionada, 0).toString();
+            String nombre = tablaEmpleado.getValueAt(filaSeleccionada, 1).toString();
+            String apellido = tablaEmpleado.getValueAt(filaSeleccionada, 2).toString();
+            String telefono = tablaEmpleado.getValueAt(filaSeleccionada, 3).toString();
+            String direccion = tablaEmpleado.getValueAt(filaSeleccionada, 4).toString();
+            String correo = tablaEmpleado.getValueAt(filaSeleccionada, 5).toString();
+
+            try (Connection conn = ConexionOracle.getConnection()) {
+                // Actualización de los datos del empleado
+                String sqlEmpleado = "UPDATE EmpleadoE SET Nombre=?, Apellido=?, Telefono=?, Direccion=?, Correo=? WHERE ID_Empleado=?";
+                PreparedStatement psEmpleado = conn.prepareStatement(sqlEmpleado);
+                psEmpleado.setString(1, nombre);
+                psEmpleado.setString(2, apellido);
+                psEmpleado.setString(3, telefono);
+                psEmpleado.setString(4, direccion);
+                psEmpleado.setString(5, correo);
+                psEmpleado.setString(6, idEmpleado);
+                psEmpleado.executeUpdate();
+
+                JOptionPane.showMessageDialog(null, "Datos actualizados correctamente.", "Edición exitosa", JOptionPane.INFORMATION_MESSAGE);
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(null, "Error al actualizar los datos: " + e.getMessage(), "Error", JOptionPane.WARNING_MESSAGE);
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Debe seleccionar una fila para actualizar.", "Error", JOptionPane.WARNING_MESSAGE);
+        }
+    }//GEN-LAST:event_actualizarActionPerformed
+
+    private void eliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_eliminarActionPerformed
+        int filaSeleccionada = tablaEmpleado.getSelectedRow();
+        if (filaSeleccionada >= 0) {
+            String idEmpleado = tablaEmpleado.getValueAt(filaSeleccionada, 0).toString();
+            int confirmacion = JOptionPane.showConfirmDialog(null, "¿Está seguro de que desea eliminar este registro?", "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
+
+            if (confirmacion == JOptionPane.YES_OPTION) {
+                try (Connection conn = ConexionOracle.getConnection()) {
+                    // Este es el query para eliminar de la tabla empleados
+                    String sqlEmpleado = "DELETE FROM EmpleadoE WHERE ID_Empleado=?";
+                    PreparedStatement psEmpleado = conn.prepareStatement(sqlEmpleado);
+                    psEmpleado.setString(1, idEmpleado);
+                    psEmpleado.executeUpdate();
+
+                    // Eliminación exitosa
+                    JOptionPane.showMessageDialog(null, "Registro eliminado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                } catch (SQLException e) {
+                    JOptionPane.showMessageDialog(null, "Error al eliminar el registro: " + e.getMessage(), "Error", JOptionPane.WARNING_MESSAGE);
+                }
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Debe seleccionar una fila para eliminar.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+        }
+    }//GEN-LAST:event_eliminarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -219,8 +314,8 @@ public class TablaEmpleado extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
     private javax.swing.JButton listar;
     private javax.swing.JButton salir;
+    private javax.swing.JTable tablaEmpleado;
     // End of variables declaration//GEN-END:variables
 }
